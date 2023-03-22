@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStatusDto } from './dto/create-status.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
+// import { Injectable, NotFoundException } from '@nestjs/common';
+// import { InjectModel } from '@nestjs/mongoose';
+// import { Model } from 'mongoose';
+// import { Status, StatusDocument } from './schemas/status.schema';
+// import { CreateStatusDto } from './dto/create-status.dto';
 
-@Injectable()
-export class StatusService {
-  create(createStatusDto: CreateStatusDto) {
-    return 'This action adds a new status';
-  }
+// @Injectable()
+// export class StatusService {
+//   constructor(
+//     @InjectModel(Status.name)
+//     private statusModel: Model<StatusDocument>,
+//   ) {}
 
-  findAll() {
-    return `This action returns all status`;
-  }
+//   async create(createStatusDto: CreateStatusDto) {
+//     const res = new this.statusModel(createStatusDto);
+//     return res.save();
+//   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} status`;
-  }
+//   async findAll() {
+//     return this.statusModel.find().exec();
+//   }
 
-  update(id: number, updateStatusDto: UpdateStatusDto) {
-    return `This action updates a #${id} status`;
-  }
+//   async findOneById(id: string) {
+//     return this.statusModel.findById(id).exec();
+//   }
 
-  remove(id: number) {
-    return `This action removes a #${id} status`;
-  }
-}
+//   async update(id: string, updateCurrencyTypeDto: UpdateCurrencyTypeDto) {
+//     return this.statusModel
+//       .findByIdAndUpdate(id, updateCurrencyTypeDto, { new: true })
+//       .exec();
+//   }
+
+//   async remove(id: string) {
+//     return this.statusModel.findByIdAndDelete(id).exec();
+//   }
+// }

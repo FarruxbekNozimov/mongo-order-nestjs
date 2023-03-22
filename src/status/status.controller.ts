@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { StatusService } from './status.service';
-import { CreateStatusDto } from './dto/create-status.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
+// import {
+//   Controller,
+//   Get,
+//   Post,
+//   Body,
+//   Param,
+//   Delete,
+//   Put,
+// } from '@nestjs/common';
+// import { CurrencyTypeService } from './currency_type.service';
+// import { CreateCurrencyTypeDto } from './dto/create-currency_type.dto';
+// import { UpdateCurrencyTypeDto } from './dto/update-currency_type.dto';
 
-@Controller('status')
-export class StatusController {
-  constructor(private readonly statusService: StatusService) {}
+// @Controller('admin')
+// export class CurrencyTypeController {
+//   constructor(private readonly currencyTypeService: CurrencyTypeService) {}
 
-  @Post()
-  create(@Body() createStatusDto: CreateStatusDto) {
-    return this.statusService.create(createStatusDto);
-  }
+//   @Post()
+//   create(@Body() createCurrencyTypeDto: CreateCurrencyTypeDto) {
+//     return this.currencyTypeService.create(createCurrencyTypeDto);
+//   }
 
-  @Get()
-  findAll() {
-    return this.statusService.findAll();
-  }
+//   @Get()
+//   findAll() {
+//     return this.currencyTypeService.findAll();
+//   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.statusService.findOne(+id);
-  }
+//   @Get(':id')
+//   findOneById(@Param('id') id: string) {
+//     return this.currencyTypeService.findOneById(id);
+//   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStatusDto: UpdateStatusDto) {
-    return this.statusService.update(+id, updateStatusDto);
-  }
+//   @Put(':id')
+//   update(
+//     @Param('id') id: string,
+//     @Body() updateCurrencyTypeDto: UpdateCurrencyTypeDto,
+//   ) {
+//     return this.currencyTypeService.update(id, updateCurrencyTypeDto);
+//   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.statusService.remove(+id);
-  }
-}
+//   @Delete(':id')
+//   remove(@Param('id') id: string) {
+//     return this.currencyTypeService.remove(id);
+//   }
+// }

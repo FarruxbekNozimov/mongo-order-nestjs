@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,7 +12,7 @@ export class AdminService {
     @InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
   ) {}
 
-  async create(createAdminDto: CreateAdminDto): Promise<Admin> {
+  async create(createAdminDto: CreateAdminDto) {
     const { user_name, password } = createAdminDto;
     const hashed_password = await bcrypt.hash(password, 7);
     const createdAdmin = new this.adminModel({
@@ -22,7 +22,7 @@ export class AdminService {
     return createdAdmin.save();
   }
 
-  async findAll(): Promise<Admin[]> {
+  async findAll() {
     return this.adminModel.find().exec();
   }
 
@@ -31,21 +31,20 @@ export class AdminService {
   }
 
   async findOneByUserName(user_name: string) {
-    return this.adminModel.findOne({ user_name }).exec();
+    const res = await this.adminModel
+      .findOne({ user_name: user_name }, { new: true })
+      .exec();
+    if (!res) return new NotFoundException('USER NOT FOUND | 404');
+    return res;
   }
 
-  async update(id: string, updateAdminDto: UpdateAdminDto): Promise<Admin> {
-    const { user_name, password } = updateAdminDto;
-    const hashed_password = await bcrypt.hash(password, 7);
+  async update(id: string, updateAdminDto: UpdateAdminDto) {
     return this.adminModel
-      .findByIdAndUpdate(id, {
-        user_name,
-        hashed_password,
-      })
+      .findByIdAndUpdate(id, updateAdminDto, { new: true })
       .exec();
   }
 
-  async remove(id: string): Promise<Admin> {
+  async remove(id: string) {
     return this.adminModel.findByIdAndDelete(id).exec();
   }
 }
