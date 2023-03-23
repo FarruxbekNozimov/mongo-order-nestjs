@@ -6,6 +6,7 @@ import { StatusModule } from './status/status.module';
 import { CurrencyTypeModule } from './currency_type/currency_type.module';
 import { OrderModule } from './order/order.module';
 import { OperationModule } from './operation/operation.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { OperationModule } from './operation/operation.module';
     CurrencyTypeModule,
     OrderModule,
     OperationModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

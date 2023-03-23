@@ -6,12 +6,13 @@ import {
   CurrencyType,
   CurrencyTypeSchema,
 } from './schemas/currency_type.shema';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: CurrencyType.name, schema: CurrencyTypeSchema },
-    ]),
+    ]),JwtModule
   ],
   controllers: [CurrencyTypeController],
   providers: [CurrencyTypeService],

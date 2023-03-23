@@ -6,88 +6,49 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login-user.dto';
-import { User } from '../users/models/user.model';
 import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { MailService } from '../mail/mail.service';
+import { AdminService } from '../admin/admin.service';
+import { CreateAdminDto } from '../admin/dto/create-admin.dto';
+import { Admin } from '../admin/schemas/admin.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UsersService,
+    private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
   ) {}
 
-  async registration(userDto: CreateUserDto, res: Response) {
-    const userIsExist = await this.userService.getUserByEmail(userDto.email);
-    if (userIsExist) {
-      throw new HttpException(`Bunday user mavjud`, HttpStatus.BAD_REQUEST);
-    }
-    if (userDto.password != userDto.confirm_password) {
-      throw new BadRequestException(`Password does not match`);
-    }
-    const hashedPassword = await bcrypt.hash(userDto.password, 7);
-    const user = await this.userService.createUser(
-      { ...userDto },
-      hashedPassword,
-    );
-    const tokens = await this.getToken(user);
-    const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
-    const uniqueKey: string = uuidv4();
-
-    const updatedUser = await this.userService.updateUser(user.id, {
-      ...user,
-      hashed_refresh_token: hashed_refresh_token,
-      activation_link: uniqueKey,
-    });
-
-    res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: 15 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    await this.mailService.sendUserConfirmation(updatedUser[1][0]);
-
-    const response = {
-      message: 'USER REGISTERED',
-      user: updatedUser[1][0],
-      tokens,
-    };
-    return response;
-  }
-
   async login(loginDto: LoginDto, res: Response) {
-    const { email, password } = loginDto;
-    const user = await this.userService.getUserByEmail(email);
-    if (!user) {
-      throw new HttpException(`Bunday mavjud emas`, HttpStatus.BAD_REQUEST);
+    const { username, password } = loginDto;
+    const admin = await this.adminService.findOneByUserName(username);
+    if (!admin) {
+      throw new HttpException(
+        `Bunday admin mavjud emas`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    const isMatchPass = await bcrypt.compare(password, user.hashed_password);
+    const isMatchPass = await bcrypt.compare(password, admin.hashed_password);
     if (!isMatchPass) {
-      throw new UnauthorizedException(`User not registered`);
+      throw new UnauthorizedException(`Admin not registered`);
     }
-    const tokens = await this.getToken(user);
+    const tokens = await this.getToken(admin, admin.id);
 
     const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
-
-    const updatedUser = await this.userService.updateUser(user.id, {
-      ...user,
-      hashed_refresh_token: hashed_refresh_token,
+    const updatedUser = await this.adminService.update(admin.id, {
+      hashed_token: hashed_refresh_token,
     });
 
     res.cookie('refresh_token', tokens.refresh_token, {
       maxAge: 15 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-
     const response = {
-      message: 'USER LOGIN',
-      user: updatedUser[1][0],
+      message: 'ADMIN LOGIN',
+      user: updatedUser,
       tokens,
     };
     return response;
@@ -100,8 +61,8 @@ export class AuthService {
     if (!userData) {
       throw new ForbiddenException('User not found');
     }
-    const updatedUser = await this.userService.updateUser(userData.id, {
-      hashed_refresh_token: refreshToken,
+    const updatedUser = await this.adminService.update(userData.id, {
+      hashed_token: refreshToken,
     });
     res.clearCookie('refresh_token');
     const response = {
@@ -111,11 +72,11 @@ export class AuthService {
     return response;
   }
 
-  private async getToken(user: User) {
+  private async getToken(admin: Admin, id: string) {
     const payload = {
-      id: user.id,
-      is_active: user.is_active,
-      is_owner: user.is_owner,
+      id,
+      is_active: admin.is_active,
+      is_owner: admin.is_creator,
     };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -124,43 +85,30 @@ export class AuthService {
       }),
       this.jwtService.signAsync(payload, {
         secret: process.env.REFRESH_TOKEN_KEY,
-        expiresIn: process.env.ACCESS_TOKEN_TIME,
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
       }),
     ]);
     return { access_token: accessToken, refresh_token: refreshToken };
   }
 
-  async refreshToken(user_id: number, refreshToken: string, res: Response) {
-    const decodedToken = this.jwtService.decode(refreshToken);
+  // async refreshToken(user_id: number, refreshToken: string, res: Response) {
+  //   const decodedToken = this.jwtService.decode(refreshToken);
 
-    if (user_id != decodedToken['id']) {
-      throw new BadRequestException('user not found');
-    }
-    const user = await this.userService.getUserById(user_id);
-    if (!user || !user.hashed_password) {
-      throw new BadRequestException('user not found');
-    }
+  //   if (user_id != decodedToken['id']) {
+  //     throw new BadRequestException('user not found');
+  //   }
+  //   const user = await this.adminService.getUserById(user_id);
+  //   if (!user || !user.hashed_password) {
+  //     throw new BadRequestException('user not found');
+  //   }
 
-    const tokenMatch = await bcrypt.compare(refreshToken, user.hashed_password);
-    const tokens = await this.getToken(user);
+  //   const tokenMatch = await bcrypt.compare(refreshToken, user.hashed_password);
+  //   const tokens = await this.getToken(user);
 
-    const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
+  //   const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
 
-    const updatedUser = await this.userService.updateUser(user.id, {
-      hashed_refresh_token: hashed_refresh_token,
-    });
-  }
-
-  private async validateUser(loginDto: LoginDto) {
-    const user = await this.userService.getUserByEmail(loginDto.email);
-
-    if (
-      !user ||
-      !(await bcrypt.compare(loginDto.password, user.hashed_password))
-    ) {
-      throw new UnauthorizedException('Email yoki password XATO !!!');
-    }
-
-    return user;
-  }
+  //   const updatedUser = await this.adminService.updateUser(user.id, {
+  //     hashed_refresh_token: hashed_refresh_token,
+  //   });
+  // }
 }

@@ -13,8 +13,17 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
-    const res = new this.orderModel(createOrderDto);
-    return res.save();
+    const order_unique_id = await this.generateID();
+    const res = await new this.orderModel({
+      ...createOrderDto,
+      order_unique_id,
+    }).save();
+    return res;
+  }
+  async generateID() {
+    let lastID =
+      String(+(await this.findAll()).at(-1)?.order_unique_id + 1) || '0000000';
+    return lastID.padStart(7, '0');
   }
 
   async findAll() {

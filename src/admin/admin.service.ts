@@ -31,17 +31,15 @@ export class AdminService {
   }
 
   async findOneByUserName(user_name: string) {
-    const res = await this.adminModel
-      .findOne({ user_name: user_name }, { new: true })
-      .exec();
-    if (!res) return new NotFoundException('USER NOT FOUND | 404');
+    const res = await this.adminModel.findOne({ user_name: user_name }).exec();
     return res;
   }
 
   async update(id: string, updateAdminDto: UpdateAdminDto) {
-    return this.adminModel
+    const res = await this.adminModel
       .findByIdAndUpdate(id, updateAdminDto, { new: true })
       .exec();
+    return res;
   }
 
   async remove(id: string) {

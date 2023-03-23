@@ -29,7 +29,7 @@ export class Admin {
   @Prop({ default: false })
   is_creator: boolean;
 
-  @Prop({ default: false })
+  @Prop({ default: true })
   is_active: boolean;
 
   @Prop()
