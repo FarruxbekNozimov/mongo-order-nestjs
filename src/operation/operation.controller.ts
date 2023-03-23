@@ -11,7 +11,7 @@ import {
 import { OperationService } from './operation.service';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
-import { JwtAuthGuard } from '../order/guards/jwt-auth.guards';
+import { JwtAuthGuard } from '../guards/jwt-auth.guards';
 
 @Controller('operation')
 export class OperationController {

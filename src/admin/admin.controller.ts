@@ -11,7 +11,7 @@ import {
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { OwnerAuthGuard } from '../order/guards/owner-auth.guards';
+import { OwnerAuthGuard } from '../guards/owner-auth.guards';
 
 @Controller('admin')
 export class AdminController {

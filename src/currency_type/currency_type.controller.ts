@@ -11,7 +11,7 @@ import {
 import { CurrencyTypeService } from './currency_type.service';
 import { CreateCurrencyTypeDto } from './dto/create-currency_type.dto';
 import { UpdateCurrencyTypeDto } from './dto/update-currency_type.dto';
-import { JwtAuthGuard } from '../order/guards/jwt-auth.guards';
+import { JwtAuthGuard } from '../guards/jwt-auth.guards';
 
 @Controller('currency-type')
 export class CurrencyTypeController {
