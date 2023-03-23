@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { CurrencyType } from '../../currency_type/schemas/currency_type.shema';
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -23,8 +24,8 @@ export class Order {
   @Prop()
   summa: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, res: 'CurrencyType' })
-  currency_type_id: string;
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'CurrencyType' }])
+  currency_type_id: CurrencyType[];
 
   @Prop()
   truck: string;

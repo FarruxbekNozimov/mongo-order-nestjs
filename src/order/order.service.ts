@@ -9,29 +9,29 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 export class OrderService {
   constructor(
     @InjectModel(Order.name)
-    private authModel: Model<OrderDocument>,
+    private orderModel: Model<OrderDocument>,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
-    const res = new this.authModel(createOrderDto);
+    const res = new this.orderModel(createOrderDto);
     return res.save();
   }
 
   async findAll() {
-    return this.authModel.find().exec();
+    return this.orderModel.find().populate('currency_type_id').exec();
   }
 
   async findOneById(id: string) {
-    return this.authModel.findById(id).exec();
+    return this.orderModel.findById(id).exec();
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto) {
-    return this.authModel
+    return this.orderModel
       .findByIdAndUpdate(id, updateOrderDto, { new: true })
       .exec();
   }
 
   async remove(id: string) {
-    return this.authModel.findByIdAndDelete(id).exec();
+    return this.orderModel.findByIdAndDelete(id).exec();
   }
 }
