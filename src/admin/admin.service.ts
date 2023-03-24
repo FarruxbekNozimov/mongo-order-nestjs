@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Admin, AdminDocument } from './schemas/admin.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AdminService {
@@ -20,6 +21,10 @@ export class AdminService {
       hashed_password,
     });
     return createdAdmin.save();
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    return this.adminModel.findByIdAndUpdate(changePasswordDto);
   }
 
   async findAll() {

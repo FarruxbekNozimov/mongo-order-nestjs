@@ -67,7 +67,7 @@ export class AuthService {
     res.clearCookie('refresh_token');
     const response = {
       message: 'User logged out successfully',
-      user: updatedUser[1][0],
+      user: updatedUser,
     };
     return response;
   }
